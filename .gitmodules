@@ -1,0 +1,6 @@
+[submodule "libraries/3rd_party/SDL3"]
+	path = libraries/3rd_party/SDL3
+	url = https://github.com/libsdl-org/SDL.git
+[submodule "libraries/3rd_party/glew"]
+	path = libraries/3rd_party/glew
+	url = https://github.com/Perlmint/glew-cmake.git
