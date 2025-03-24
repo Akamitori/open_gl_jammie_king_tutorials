@@ -1,16 +1,8 @@
 ﻿#include <iostream>
-#include <fstream>
-#include <iostream>
-#include <sstream>
-#include <vector>
-#include <algorithm>
-#include <format>
-
 #include <GL/glew.h>
 #include <SDL3/SDL_keyboard.h>
 #include <SDL3/SDL_init.h>
 #include "Shader.h"
-#include <SDL3/SDL_timer.h>
 
 void handle_window_resize(const int width, const int height) {
     const float new_aspect_ratio = static_cast<float>(width) / static_cast<float>(height);
@@ -18,8 +10,6 @@ void handle_window_resize(const int width, const int height) {
 }
 
 void KeyDown(SDL_Scancode key) {
-    bool camera_changed = true;
-
     switch (key) {
         case SDL_SCANCODE_W: {
             break;
@@ -52,7 +42,6 @@ void KeyDown(SDL_Scancode key) {
             break;
         }
         default: {
-            camera_changed = false;
             break;
         }
     }
@@ -111,7 +100,6 @@ int main() {
     glDepthMask(GL_TRUE);
     glDepthFunc(GL_LEQUAL);
     glDepthRange(0.0f, 1.0f);
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1); // Enable MSAA
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4); // Request 4x MSAA (adjust as needed)
@@ -130,8 +118,7 @@ int main() {
     };
     
     unsigned int indices[] = {0, 1, 2};
-
-
+    
     GLuint triangle_vao;
     glGenVertexArrays(1, &triangle_vao);
 
@@ -196,11 +183,18 @@ int main() {
 
         glBindVertexArray(0);
         glUseProgram(0);
-
-
+        
         SDL_GL_SwapWindow(window);
-        SDL_Delay(std::ceil((1 / 60.f) * 1000));
     }
+
+    // Cleanup
+    glDeleteVertexArrays(1, &triangle_vao);
+    glDeleteBuffers(1, &triangle_vbo);
+    glDeleteBuffers(1, &triangle_vbo);
+
+    SDL_DestroyWindow(window);
+    SDL_GL_DestroyContext(open_gl_context);
+    SDL_Quit();
 
     return 0;
 }
