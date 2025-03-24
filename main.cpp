@@ -3,6 +3,7 @@
 #include <SDL3/SDL_keyboard.h>
 #include <SDL3/SDL_init.h>
 #include "Shader.h"
+#include <glm/vec3.hpp> // glm::vec3
 
 void handle_window_resize(const int width, const int height) {
     const float new_aspect_ratio = static_cast<float>(width) / static_cast<float>(height);
@@ -60,6 +61,8 @@ int main() {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
+    glm::vec3 a{1,2,3};
+
 
     constexpr int screenWidth = 800, screenHeight = 600;
     // Create window
@@ -67,7 +70,6 @@ int main() {
                                           SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
     if (!window) {
         std::cerr << "Failed to create SDL window. Error :" << SDL_GetError() << std::endl;
-
         SDL_Quit();
         return -1;
     }
@@ -107,7 +109,7 @@ int main() {
 
     shaderProgram = InitializeProgram("program1");
 
-    float triangle[9 + 9] = {
+    GLfloat triangle[9 + 9] = {
         0, 0, 0,
         1, 0, 0,
         0, 1, 0,

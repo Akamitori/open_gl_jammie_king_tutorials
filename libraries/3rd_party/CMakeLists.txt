@@ -17,8 +17,9 @@ set(glew-cmake_BUILD_SHARED ON CACHE BOOL "Build the shared glew library")
 set(glew-cmake_BUILD_STATIC OFF CACHE BOOL "Build the static glew library")
 set(ONLY_LIBS ON CACHE BOOL "Do not build executables")
 add_subdirectory(glew)
+add_subdirectory(glm)
 
-install(TARGETS SDL3-shared libglew_shared
+install(TARGETS SDL3-shared libglew_shared glm
         RUNTIME DESTINATION ${BINARY_DIRECTORY}  # DLLs
         LIBRARY DESTINATION ${BINARY_DIRECTORY_LIBS}  # .so/.dylib
 )

@@ -1,5 +1,6 @@
 ﻿cmake_minimum_required(VERSION 3.30)
-project(opengl_book)
+set(PROJECT_NAME open_gl_jamie_tutorials)
+project(${PROJECT_NAME})
 
 set(CMAKE_CXX_STANDARD 20)
 
@@ -12,13 +13,14 @@ add_subdirectory(libraries)
 
 find_package(OpenGL REQUIRED)
 
-add_executable(opengl_book main.cpp)
+add_executable(${PROJECT_NAME} main.cpp)
 
-target_link_libraries(opengl_book
+target_link_libraries(${PROJECT_NAME}
         PUBLIC
         libglew_shared
         SDL3::SDL3
         OpenGL_Utilities
+        glm::glm
 )
 
 ##### -------------COPY SHADERS           --------------
@@ -32,11 +34,11 @@ add_custom_target(copy_shaders ALL
         COMMENT "Copying shader programs to build directory"
 )
 
-add_dependencies(opengl_book copy_shaders)
+add_dependencies(${PROJECT_NAME} copy_shaders)
 
 
 add_custom_command(
-        TARGET opengl_book POST_BUILD
+        TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} --install ${CMAKE_BINARY_DIR}
         COMMENT "Running the install step after all builds are complete"
 )
