@@ -1,23 +1,26 @@
 ﻿#include "Shader.h"
-
 #include <algorithm>
 #include <fstream>
 #include <iostream>
-#include <sstream>
 #include <vector>
 
 
 const std::string LOCAL_FILE_DIR("data/");
 // Vertex Shader source code
 
-std::string FindFileOrThrow(const std::string &strBasename, const std::string &program_id) {
+std::string LoadShaderCodeOrThrow(const std::string &strBasename, const std::string &program_id) {
     std::string strFilename = LOCAL_FILE_DIR + program_id + '/' + strBasename;
-    const std::ifstream testFile(strFilename.c_str());
-    if (testFile.is_open())
-        return strFilename;
+    std::ifstream shaderFile(strFilename);
+    if (!shaderFile.is_open()) {
+        std::cerr << "Could not find the file " + strBasename + " for program with id : " + program_id +
+                "(at location :" + strFilename + ")";
+        exit(1);
+    }
 
-    std::cerr << "Could not find the file " + strBasename + " for program with id : " + program_id;
-    throw;
+    return {
+        (std::istreambuf_iterator<char>(shaderFile)),
+        std::istreambuf_iterator<char>()
+    };
 }
 
 // Function to compile shaders
@@ -27,30 +30,23 @@ unsigned int compileShader(unsigned int type, const std::string &source) {
     glShaderSource(id, 1, &source_c_str, nullptr);
     glCompileShader(id);
 
-    int success;
+    GLint success;
     glGetShaderiv(id, GL_COMPILE_STATUS, &success);
-    if (!success) {
-        char infoLog[512];
-        glGetShaderInfoLog(id, 512, nullptr, infoLog);
+    if (success != GL_TRUE) {
+        GLint length;
+        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
+        GLchar *infoLog = new GLchar[length];
+        glGetShaderInfoLog(id, length, nullptr, infoLog);
         std::cerr << "Shader compilation failed\n" << infoLog << std::endl;
+        delete [] infoLog;
     }
 
     return id;
 }
 
 GLuint LoadShader(const GLenum eShaderType, const std::string &strShaderFilename, const std::string &programId) {
-    const std::string strFilename = FindFileOrThrow(strShaderFilename, programId);
-    std::ifstream shaderFile(strFilename.c_str());
-    std::stringstream shaderData;
-    shaderData << shaderFile.rdbuf();
-    shaderFile.close();
-
-    try {
-        return compileShader(eShaderType, shaderData.str());
-    } catch (std::exception &e) {
-        std::cerr << e.what() << std::endl;
-        throw;
-    }
+    const std::string shader_data = LoadShaderCodeOrThrow(strShaderFilename, programId);
+    return compileShader(eShaderType, shader_data);
 }
 
 
@@ -67,14 +63,16 @@ unsigned int InitializeProgram(const std::string &program_id) {
     });
     glLinkProgram(shaderProgram);
 
-    int success;
+    GLint success;
     glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if (!success) {
-        char infoLog[512];
-        glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
+    if (success != GL_TRUE) {
+        GLint length;
+        glGetProgramiv(shaderProgram, GL_INFO_LOG_LENGTH, &length);
+        GLchar *infoLog = new GLchar[length];
+        glGetProgramInfoLog(shaderProgram, length, nullptr, infoLog);
         std::cerr << "Shader linking failed\n" << infoLog << std::endl;
+        delete[] infoLog;
     }
-
 
     std::ranges::for_each(shaders,glDeleteShader);
 

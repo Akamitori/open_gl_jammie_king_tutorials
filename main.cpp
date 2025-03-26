@@ -106,21 +106,31 @@ int main() {
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1); // Enable MSAA
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4); // Request 4x MSAA (adjust as needed)
     glEnable(GL_MULTISAMPLE);
-
+    
     shaderProgram = InitializeProgram("program1");
 
-    GLfloat triangle[9 + 9] = {
+    GLfloat triangle[] = {
         0, 0, 0,
         1, 0, 0,
+
+        1, 1, 0,
         0, 1, 0,
 
-        1, 0, 0,
+        -1, 1, 0,
+        0, 0, 1,
+
+
+        -1, -1, 0,
+        0, 0, 1,
+
+
+        1, -1, 0,
         0, 1, 0,
-        0, 0, 1
+
     };
-    
-    unsigned int indices[] = {0, 1, 2};
-    
+
+    GLushort indices[] = {0, 1, 2, 0, 3, 4};
+
     GLuint triangle_vao;
     glGenVertexArrays(1, &triangle_vao);
 
@@ -139,11 +149,11 @@ int main() {
 
     // Define the vertex attributes (position)
     constexpr int vertex_pos_index = 0;
-    glVertexAttribPointer(vertex_pos_index, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+    glVertexAttribPointer(vertex_pos_index, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), nullptr);
     glEnableVertexAttribArray(vertex_pos_index);
 
     //Define the vertex attributes (color)
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), reinterpret_cast<void *>(9 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), reinterpret_cast<void *>(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
     glBindVertexArray(0);
@@ -181,11 +191,12 @@ int main() {
 
         glUseProgram(shaderProgram);
         glBindVertexArray(triangle_vao);
-        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, nullptr);
+
 
         glBindVertexArray(0);
         glUseProgram(0);
-        
+
         SDL_GL_SwapWindow(window);
     }
 
